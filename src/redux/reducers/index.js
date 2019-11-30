@@ -1,18 +1,32 @@
 // import storage from 'redux-persist/es/storage';
-import AsyncStorage from '@react-native-community/async-storage';
-import {persistCombineReducers} from 'redux-persist';
+// import AsyncStorage from '@react-native-community/async-storage';
+// import {persistReducer} from 'redux-persist';
+import {combineReducers} from 'redux';
 
-import Auth from './user/auth';
-import userDevice from './device/userDevice';
+import {
+  authReducer,
+  cutiReducer,
+  perdinReducer,
+  homeReducer,
+  absenReducer,
+  lemburReducer,
+  ukesReducer,
+} from '../../features/reducersFeature';
 
-const config = {
-  key: 'root',
-  storage: AsyncStorage,
-};
-
-const reducer = persistCombineReducers(config, {
-  user: Auth,
-  device: userDevice,
+// const config = {
+//   key: 'root',
+//   storage: AsyncStorage,
+//   whitelist: ['auth'],
+// };
+const rootReducers = combineReducers({
+  auth: authReducer,
+  cuti: cutiReducer,
+  perdin: perdinReducer,
+  home: homeReducer,
+  absenReducer,
+  lembur: lemburReducer,
+  ukes: ukesReducer,
 });
+// const reducer = persistReducer(config, rootReducers);
 
-export default reducer;
+export default rootReducers;

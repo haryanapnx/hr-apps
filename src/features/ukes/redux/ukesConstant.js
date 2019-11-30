@@ -1,0 +1,3 @@
+export const GET_UKES = 'GET_UKES';
+export const GET_APPROVAL_KONTIGENSI = 'GET_APPROVAL_KONTIGENSI';
+export const LOADING_UKES = 'LOADING_UKES';

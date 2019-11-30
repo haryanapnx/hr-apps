@@ -1,43 +1,199 @@
 import React, {useState} from 'react';
+import {bulan, tahun} from '../../../commons/data';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-import {Container, DatePicker, Item, Icon, Input} from 'native-base';
+import {
+  Container,
+  Item,
+  Icon,
+  Content,
+  Accordion,
+  Card,
+  CardItem,
+  Left,
+  Body,
+  Right,
+  Button,
+  Badge,
+  Picker,
+} from 'native-base';
+import {WhiteSpace} from '@ant-design/react-native';
+import {View} from 'react-native';
 import {Row, Col} from '../../../components/Grid';
+import Text from '../../../components/Text';
+import {isEmpty} from '../../../commons/helper';
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
 
-const DaftarCuti = () => {
+const DaftarCuti = ({
+  listCuti,
+  loading,
+  defaultGetCuti,
+  bln,
+  thn,
+  handleDate,
+}) => {
   const [chosenDate, setdate] = useState(new Date());
   const setDate = newDate => {
     setdate(newDate);
   };
+  const _renderHeader = (item, expanded) => {
+    return (
+      <Card
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 0,
+        }}>
+        <CardItem>
+          <Left>
+            <Body>
+              <Text bold={true}>Nrp: {item.nrp}</Text>
+              <Text size={12}>Tgl Pengajuan:</Text>
+              <Text bold={true}>
+                {dayjs(item.tgl_pengajuan).format('DD MMM YYYY')}
+              </Text>
+              <Badge warning style={{height: 18}}>
+                <Content>
+                  <Text size={11} color="#fff">
+                    {item.approval.status}
+                  </Text>
+                </Content>
+              </Badge>
+            </Body>
+          </Left>
+          <Right>
+            <Icon name="remove-circle" />
+          </Right>
+        </CardItem>
+      </Card>
+    );
+  };
+  const _renderContent = item => {
+    return (
+      <>
+        <Card style={{marginTop: 0, backgroundColor: '#deedff'}}>
+          <CardItem>
+            <Row>
+              <Col size={4}>
+                <View>
+                  <Text bold={true}>{item.nama}</Text>
+                  <Text>Nrp: {item.nrp}</Text>
+                </View>
+              </Col>
+              <Col size={4}>
+                <View>
+                  <Text size={12}>Dari:</Text>
+                  <Text bold={true}>
+                    {dayjs(item.tgl_mulai).format('DD MMM YYYY')}
+                  </Text>
+                  <Text size={12}>Sampai</Text>
+                  <Text bold={true}>
+                    {dayjs(item.tgl_selesai).format('DD MMM YYYY')}
+                  </Text>
+                </View>
+              </Col>
+              <Col size={4}>
+                <View>
+                  <Text size={12}>Tgl Pengajuan:</Text>
+                  <Text bold={true}>
+                    {dayjs(item.tgl_pengajuan).format('DD MMM YYYY')}
+                  </Text>
+                  <Text size={12}>Tgl Approval</Text>
+                  <Text bold={true}>
+                    {!isEmpty(item.tgl_approval) &&
+                      dayjs(item.tgl_approval).format('DD MMM YYYY')}
+                  </Text>
+                </View>
+              </Col>
+            </Row>
+          </CardItem>
+          <CardItem>
+            <View>
+              <Text size={12}>Alasan</Text>
+              <Text bold={true}>{item.alasan}</Text>
+            </View>
+          </CardItem>
+          <CardItem>
+            <View>
+              <Text size={12}>Catatan Approval</Text>
+              <Text bold={true}>{item.catatan_approval}</Text>
+            </View>
+          </CardItem>
+        </Card>
+        <WhiteSpace />
+      </>
+    );
+  };
+  const isLoading = [1, 2, 4];
+
   return (
-    <Container style={{elevation: 5}}>
+    <Container>
       <Row>
-        <Col size={6}>
-          <Item style={{padding: 4.1}}>
-            <Icon name="calendar" color="#999" style={{marginLeft: 5}} />
-            <DatePicker
-              defaultDate={chosenDate}
-              minimumDate={new Date(2000, 1, 1)}
-              maximumDate={new Date(2018, 12, 31)}
-              locale={dayjs.locale('id')}
-              modalTransparent={false}
-              animationType={'fade'}
-              androidMode={'spinner'}
-              placeHolderText="Filter by Date"
-              textStyle={{color: 'green'}}
-              // placeHolderTextStyle={{color: '#d3d3d3'}}
-              onDateChange={setDate}
-              disabled={false}
-            />
+        <Col size={5}>
+          <Item>
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                placeholder="Bulan"
+                style={{width: undefined}}
+                placeholderStyle={{color: '#bfc6ea'}}
+                placeholderIconColor="#007aff"
+                selectedValue={bln}
+                onValueChange={val => handleDate('bln', val)}>
+                {bulan.map(({label, value}, i) => (
+                  <Picker.Item key={i} label={label} value={value} />
+                ))}
+              </Picker>
+            </Item>
           </Item>
         </Col>
-        <Col size={6}>
+        <Col size={5}>
           <Item>
-            <Icon name="ios-search" />
-            <Input placeholder="Search" />
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                placeholder="Bulan"
+                style={{width: undefined}}
+                placeholderStyle={{color: '#bfc6ea'}}
+                placeholderIconColor="#007aff"
+                selectedValue={thn}
+                onValueChange={val => handleDate('thn', val)}>
+                {tahun.map(({label}, i) => (
+                  <Picker.Item key={i} label={label} value={label} />
+                ))}
+              </Picker>
+            </Item>
           </Item>
+        </Col>
+        <Col size={2}>
+          <Button onPress={defaultGetCuti} transparent iconLeft>
+            <Icon name="ios-search" />
+          </Button>
         </Col>
       </Row>
+      <Content>
+        {loading
+          ? isLoading.map(item => (
+              <ShimmerPlaceHolder
+                key={item}
+                width={400}
+                height={50}
+                autoRun={true}
+                style={{marginBottom: 5}}
+              />
+            ))
+          : !isEmpty(listCuti) && (
+              <Accordion
+                dataArray={listCuti}
+                animation={true}
+                expanded={true}
+                renderHeader={_renderHeader}
+                renderContent={_renderContent}
+              />
+            )}
+      </Content>
     </Container>
   );
 };

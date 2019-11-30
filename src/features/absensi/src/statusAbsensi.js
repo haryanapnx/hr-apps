@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import dayjs from 'dayjs';
-import {Text, StyleSheet, ScrollView, View} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
 import {Calendar} from 'react-native-calendars';
 
 class StatusAbsensi extends React.Component {

@@ -1,64 +1,41 @@
-import React, {Component} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Button,
-} from 'react-native';
-import {Icon} from '@ant-design/react-native';
+import React from 'react';
+import {View, TouchableOpacity, Image} from 'react-native';
+import {Icon} from 'native-base';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createDrawerNavigator, DrawerActions} from 'react-navigation-drawer';
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 
 import Sidebar from '../components/Sidebar';
-import Home from '../features/home/home';
-import Absensi from '../features/absensi/absensi';
-import Cuti from '../features/cuti/cuti';
+import LoginScreen from '../components/User/LoginScreen';
+import {
+  Login,
+  AuthLoading,
+  Home,
+  Absensi,
+  Cuti,
+  Lembur,
+  Perdin,
+  Ukes,
+} from '../features';
 
-class Screen3 extends Component {
-  render() {
-    return (
-      <View style={styles.MainContainer}>
-        <Text style={{fontSize: 23}}> Screen 3 </Text>
-      </View>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  MainContainer: {
-    flex: 1,
-    paddingTop: 20,
-    alignItems: 'center',
-    marginTop: 50,
-    justifyContent: 'center',
-  },
-});
-
-class NavigationDrawerStructure extends Component {
-  toggleDrawer = () => {
-    this.props.navigationProps.dispatch(DrawerActions.toggleDrawer());
+const NaviDrawerStructure = ({nav}) => {
+  const toggleDrawer = () => {
+    nav.dispatch(DrawerActions.toggleDrawer());
   };
-  render() {
-    return (
-      <View style={{flexDirection: 'row', padding: 10}}>
-        <TouchableOpacity onPress={this.toggleDrawer.bind(this)}>
-          <Icon name="menu-fold" />
-          {/* <Button onPress={this.toggleDrawer.bind(this)} title="klik" /> */}
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
+  return (
+    <View style={{flexDirection: 'row', padding: 10}}>
+      <TouchableOpacity onPress={toggleDrawer}>
+        <Icon name="menu" style={{color: 'white'}} />
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-const HomeScreen = createStackNavigator({
-  First: {
-    screen: Home,
+const menuDrawer = title => {
+  return {
     navigationOptions: ({navigation}) => ({
-      title: 'Home',
-      headerLeft: <NavigationDrawerStructure navigationProps={navigation} />,
+      title: title,
+      headerLeft: <NaviDrawerStructure nav={navigation} />,
       headerRight: (
         <Image
           style={{width: 50, height: 40, marginRight: 8}}
@@ -70,62 +47,28 @@ const HomeScreen = createStackNavigator({
       },
       headerTintColor: '#fff',
     }),
-  },
+  };
+};
+
+const HomeScreen = createStackNavigator({
+  1: {screen: Home, ...menuDrawer('Home')},
 });
 
 const AbsensiScreen = createStackNavigator({
-  Second: {
-    screen: Absensi,
-    navigationOptions: ({navigation}) => ({
-      title: 'Absensi',
-      headerLeft: <NavigationDrawerStructure navigationProps={navigation} />,
-      headerRight: (
-        <Image
-          style={{width: 50, height: 40, marginRight: 8}}
-          source={require('../../assets/images/bjb.png')}
-        />
-      ),
-      headerStyle: {
-        backgroundColor: '#144e92',
-      },
-      headerTintColor: '#fff',
-    }),
-  },
+  2: {screen: Absensi, ...menuDrawer('Absensi')},
 });
 
 const CutiScreen = createStackNavigator({
-  //All the screen from the Screen3 will be indexed here
-  Third: {
-    screen: Cuti,
-    navigationOptions: ({navigation}) => ({
-      title: 'Demo Screen 3',
-      headerLeft: <NavigationDrawerStructure navigationProps={navigation} />,
-      headerRight: (
-        <Image
-          style={{width: 50, height: 40, marginRight: 8}}
-          source={require('../../assets/images/bjb.png')}
-        />
-      ),
-      headerStyle: {
-        backgroundColor: '#144e92',
-      },
-      headerTintColor: '#fff',
-    }),
-  },
+  3: {screen: Cuti, ...menuDrawer('Cuti')},
 });
-const Screen4_StackNavigator = createStackNavigator({
-  //All the screen from the Screen3 will be indexed here
-  Third: {
-    screen: Screen3,
-    navigationOptions: ({navigation}) => ({
-      title: 'Demo Screen 3',
-      headerLeft: <NavigationDrawerStructure navigationProps={navigation} />,
-      headerStyle: {
-        backgroundColor: '#144e92',
-      },
-      headerTintColor: '#fff',
-    }),
-  },
+const LemburScreen = createStackNavigator({
+  4: {screen: Lembur, ...menuDrawer('Lembur')},
+});
+const PerdinScreen = createStackNavigator({
+  5: {screen: Perdin, ...menuDrawer('Perdin')},
+});
+const UkesScreen = createStackNavigator({
+  5: {screen: Ukes, ...menuDrawer('Ukes')},
 });
 
 const AppNavigator = createDrawerNavigator(
@@ -139,21 +82,36 @@ const AppNavigator = createDrawerNavigator(
     cuti: {
       screen: CutiScreen,
     },
+    lembur: {
+      screen: LemburScreen,
+    },
+    perdin: {
+      screen: PerdinScreen,
+    },
+    ukes: {
+      screen: UkesScreen,
+    },
   },
   {
     contentComponent: Sidebar,
     drawerWidth: 300,
+    initialRouteName: 'home',
   },
 );
-const App = createAppContainer(AppNavigator);
-// const AppNavigator = createStackNavigator(
-//   {
-//         App: MainStack,
-//   },
-//   {
-//     mode: 'modal',
-//     headerMode: 'none',
-//   },
-// );
+
+const Auth = createStackNavigator({Login: LoginScreen});
+
+const App = createAppContainer(
+  createSwitchNavigator(
+    {
+      App: AppNavigator,
+      AuthLoading: AuthLoading,
+      Auth: Auth,
+    },
+    {
+      initialRouteName: 'AuthLoading',
+    },
+  ),
+);
 
 export default App;

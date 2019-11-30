@@ -1,5 +1,7 @@
-import React, {Component} from 'react';
+import React from 'react';
+import LinearGradient from 'react-native-linear-gradient';
 import {NavigationActions} from 'react-navigation';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   ScrollView,
   TouchableHighlight,
@@ -7,32 +9,45 @@ import {
   View,
   StyleSheet,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import {Row, Col} from '../Grid';
 import {Icon} from '@ant-design/react-native';
+import {removeUserToken} from '../../features/auth/redux/action';
 
 const menu = [
   {name: 'Home', icon: 'home', section: false, link: 'home'},
   {name: 'Absensi', icon: 'calendar', section: false, link: 'absensi'},
   {name: 'Cuti', icon: 'carry-out', section: false, link: 'cuti'},
-  {name: 'Lembur', icon: 'reload-time', section: true, link: 'Screen4'},
-  {name: 'Perdin', icon: 'book', section: false, link: 'Screen4'},
-  {name: 'Ukes', icon: 'medicine-box', section: false, link: 'Screen4'},
+  {name: 'Lembur', icon: 'reload-time', section: true, link: 'lembur'},
+  {name: 'Perdin', icon: 'book', section: false, link: 'perdin'},
+  {name: 'Ukes', icon: 'medicine-box', section: false, link: 'ukes'},
   {name: 'Approval', icon: 'check-square', section: true, link: 'Screen4'},
-  {name: 'Logout', icon: 'logout', section: false, link: 'Screen4'},
+  //   {name: 'Logout', icon: 'logout', section: false, link: 'Screen4'},
 ];
-class SideBar extends Component {
-  navigateToScreen = route => () => {
+const SideBar = props => {
+  const dispatch = useDispatch();
+  const {data} = useSelector(state => state.auth);
+
+  const navigateToScreen = route => () => {
     const navigateAction = NavigationActions.navigate({
       routeName: route,
     });
-    this.props.navigation.dispatch(navigateAction);
+    props.navigation.dispatch(navigateAction);
   };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView>
+  const signOut = async () => {
+    dispatch(removeUserToken());
+    props.navigation.navigate('AuthLoading');
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        <LinearGradient
+          start={{x: 1, y: 0}}
+          end={{x: 1, y: 1}}
+          colors={['rgba(65,162,247,1)', 'rgba(20,78,146,1)']}>
           <View style={styles.profile}>
             <TouchableHighlight style={[styles.profileImgContainer]}>
               <Image
@@ -40,10 +55,11 @@ class SideBar extends Component {
                 style={styles.profileImg}
               />
             </TouchableHighlight>
+
             <Row>
               <Col size={8}>
-                <Text style={styles.profileText}> Dadang Rohandi</Text>
-                <Text style={styles.profileText}> 10.75.90</Text>
+                <Text style={styles.profileText}> {data.name}</Text>
+                <Text style={styles.profileText}> {data.nip}</Text>
               </Col>
               <Col
                 style={{textAlign: 'right', justifyContent: 'flex-end'}}
@@ -52,36 +68,46 @@ class SideBar extends Component {
               </Col>
             </Row>
           </View>
-          {menu.map((item, i) => (
-            <View key={i} style={styles.navSectionStyle}>
-              <Row>
-                <Col size={2}>
-                  <Icon name={item.icon} />
-                </Col>
-                <Col style={{textAlignVertical: 'center'}} size={4}>
-                  <Text
-                    style={styles.navItemStyle}
-                    onPress={this.navigateToScreen(item.link)}>
-                    {item.name}
-                  </Text>
-                </Col>
-              </Row>
-              {item.section && (
-                <View
-                  style={{
-                    marginTop: 20,
-                    borderBottomColor: '#f2f2f2',
-                    borderBottomWidth: 1,
-                  }}
-                />
-              )}
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-    );
-  }
-}
+        </LinearGradient>
+        {menu.map((item, i) => (
+          <View key={i} style={styles.navSectionStyle}>
+            <Row>
+              <Col size={2}>
+                <Icon name={item.icon} />
+              </Col>
+              <Col style={{textAlignVertical: 'center'}} size={4}>
+                <TouchableOpacity onPress={navigateToScreen(item.link)}>
+                  <Text style={styles.navItemStyle}>{item.name}</Text>
+                </TouchableOpacity>
+              </Col>
+            </Row>
+            {item.section && (
+              <View
+                style={{
+                  marginTop: 20,
+                  borderBottomColor: '#f2f2f2',
+                  borderBottomWidth: 1,
+                }}
+              />
+            )}
+          </View>
+        ))}
+        <View style={styles.navSectionStyle}>
+          <Row>
+            <Col size={2}>
+              <Icon name="logout" />
+            </Col>
+            <Col style={{textAlignVertical: 'center'}} size={4}>
+              <TouchableOpacity onPress={signOut}>
+                <Text style={styles.navItemStyle}>Logout</Text>
+              </TouchableOpacity>
+            </Col>
+          </Row>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
 
 export default SideBar;
 
@@ -110,7 +136,7 @@ const styles = StyleSheet.create({
   profile: {
     height: 160,
     padding: 10,
-    backgroundColor: '#144e92',
+    //  backgroundColor: '#144e92',
   },
   container: {
     flex: 1,
